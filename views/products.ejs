@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleAddProductPopup() {
+      const popup = document.getElementById('addProductPopup');
+      popup.classList.toggle('hidden');
+    }
+
+    function toggleEditProductPopup(index, name, quantity) {
+      const popup = document.getElementById('editProductPopup');
+      const nameInput = document.getElementById('editProductName');
+      const quantityInput = document.getElementById('editProductQuantity');
+      const indexInput = document.getElementById('editProductIndex');
+
+      nameInput.value = name;
+      quantityInput.value = quantity;
+      indexInput.value = index;
+
+      popup.classList.toggle('hidden');
+    }
+  </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4 transition-all duration-300">
+  <h1 class="text-4xl font-bold text-gray-100 mb-8 text-center"></h1>
+  
+  <!-- Button to show add product popup -->
+  <div class="flex gap-4 mb-6">
+    <button onclick="toggleAddProductPopup()" class="px-6 py-3 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white rounded-full shadow-lg transform transition-transform hover:scale-105 hover:shadow-2xl focus:outline-none">Add Product</button>
+    <a href="/export" class="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white rounded-full shadow-lg transform transition-transform hover:scale-105 hover:shadow-2xl focus:outline-none">Export to Excel</a>
+  </div>
+
+  <!-- Add Product Popup -->
+  <div id="addProductPopup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center z-50">
+    <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-100 mb-6">Add New Product</h2>
+      <form action="/add" method="POST" class="flex flex-col gap-6">
+        <input type="text" name="name" placeholder="Product Name" class="border border-gray-600 bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+        <input type="number" name="quantity" placeholder="Quantity" class="border border-gray-600 bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+        <div class="flex justify-end gap-4">
+          <button type="button" onclick="toggleAddProductPopup()" class="px-6 py-2 bg-gray-600 text-white rounded-full shadow-md hover:bg-gray-500 transform transition-transform hover:scale-105">Cancel</button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white rounded-full shadow-md hover:shadow-lg transform transition-transform hover:scale-105">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Product Popup -->
+  <div id="editProductPopup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center z-50">
+    <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-100 mb-6">Edit Product</h2>
+      <form action="/edit" method="POST" class="flex flex-col gap-6">
+        <input type="hidden" name="index" id="editProductIndex">
+        <input type="text" name="name" id="editProductName" class="border border-gray-600 bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none" readonly>
+        <input type="number" name="quantity" id="editProductQuantity" class="border border-gray-600 bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+        <div class="flex justify-end gap-4">
+          <button type="button" onclick="toggleEditProductPopup()" class="px-6 py-2 bg-gray-600 text-white rounded-full shadow-md hover:bg-gray-500 transform transition-transform hover:scale-105">Cancel</button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white rounded-full shadow-md hover:shadow-lg transform transition-transform hover:scale-105">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Grid (Carousel/Responsive Grid) -->
+  <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+    <% products.forEach((product, index) => { %>
+      <li class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300">
+        <div class="flex flex-col items-center text-center">
+          <h3 class="text-xl font-semibold text-white mb-2"><%= product.name %></h3>
+          <p class="text-gray-400 mb-4">Quantity: <%= product.quantity %></p>
+
+          <!-- Action buttons -->
+          <div class="flex gap-4 justify-center">
+            <!-- Edit Button -->
+            <button onclick="toggleEditProductPopup(<%= index %>, '<%= product.name %>', <%= product.quantity %>)" class="px-4 py-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white rounded-full shadow-md transform transition-transform hover:scale-105 hover:shadow-lg focus:outline-none">Edit</button>
+            
+            <!-- Delete Button (inside a form) -->
+            <form action="/delete" method="POST" class="inline">
+              <input type="hidden" name="index" value="<%= index %>">
+              <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white rounded-full shadow-md transform transition-transform hover:scale-105 hover:shadow-lg focus:outline-none">Delete</button>
+            </form>
+          </div>
+        </div>
+      </li>
+    <% }); %>
+  </ul>
+  </body>
+</html>
